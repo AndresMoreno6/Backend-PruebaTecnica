@@ -29,7 +29,7 @@ class Pais extends Model
 		'nombre'
 	];
 
-	public function ciudads()
+	public function ciudades()
 	{
 		return $this->hasMany(Ciudad::class, 'pais_id');
 	}

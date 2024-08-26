@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CiudadController;
+use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PaisController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,4 +18,11 @@ Route::get('/paises/{pais}/ciudades', [CiudadController::class, 'show']);
 // Route::get("/paises/{id}", [PaisController::class,'show']);
 Route::get("/ciudades", [CiudadController::class,'index']);
 
-Route::get('/cambioMoneda', [CiudadController::class, 'getCambio']);
+// Route::get('/cambioMoneda', [CiudadController::class, 'getCambio']);
+
+Route::post('/cambioMoneda', [HistorialController::class, 'cambioMoneda']);
+
+Route::post('/clima', [HistorialController::class, 'obtenerClima']);
+
+
+Route::post('/historial', [HistorialController::class, 'store']);
