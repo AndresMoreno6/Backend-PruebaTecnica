@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $ciudad_id
  * @property float $presupuesto_cop
  * @property int $presupuesto_local
+ * @property float $tasa_cambio
  * @property string $clima
  * @property Carbon $fecha
  *
@@ -34,7 +35,8 @@ class Historial extends Model
 		'pais_id' => 'int',
 		'ciudad_id' => 'int',
 		'presupuesto_cop' => 'float',
-		'presupuesto_local' => 'int',
+		'presupuesto_local' => 'string',
+		'tasa_cambio' => 'string',
 		'fecha' => 'datetime'
 	];
 
@@ -43,6 +45,7 @@ class Historial extends Model
 		'ciudad_id',
 		'presupuesto_cop',
 		'presupuesto_local',
+		'tasa_cambio',
 		'clima',
 		'fecha'
 	];

@@ -6,23 +6,20 @@ use App\Http\Controllers\PaisController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 
-Route::get("/paises", [PaisController::class,'index']);
-Route::get('/paises/{pais}/ciudades', [CiudadController::class, 'show']);
+Route::get("/paises", [PaisController::class,'paises']);
 
+Route::get('/paises/{pais}/ciudades', [CiudadController::class, 'ciudadesPorPais']);
 
-// Route::get("/paises/{id}", [PaisController::class,'show']);
-Route::get("/ciudades", [CiudadController::class,'index']);
-
-// Route::get('/cambioMoneda', [CiudadController::class, 'getCambio']);
+// Route::get("/ciudades", [CiudadController::class,'index']);
 
 Route::post('/cambioMoneda', [HistorialController::class, 'cambioMoneda']);
 
 Route::post('/clima', [HistorialController::class, 'obtenerClima']);
 
+Route::post('/busquedas', [HistorialController::class, 'guardarBusqueda']);
 
-Route::post('/historial', [HistorialController::class, 'store']);
+Route::get('/historial/{id}', [HistorialController::class,'obtenerHistorial']);
+
+Route::get('/busquedashistorial', [HistorialController::class,'historialBusquedas']);

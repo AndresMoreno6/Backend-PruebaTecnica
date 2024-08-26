@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('historial', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('pais_id');
+            $table->integer('pais_id')->index('pais_id');
             $table->integer('ciudad_id')->index('ciudad_id');
             $table->decimal('presupuesto_cop', 15, 0);
-            $table->integer('presupuesto_local');
+            $table->string('presupuesto_local', 20);
+            $table->string('tasa_cambio', 20);
             $table->string('clima', 50);
             $table->date('fecha')->useCurrent();
-
-            $table->unique(['pais_id', 'ciudad_id'], 'pais_id');
         });
     }
 

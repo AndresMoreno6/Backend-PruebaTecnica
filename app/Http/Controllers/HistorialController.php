@@ -7,39 +7,42 @@ use App\Models\Ciudad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
+use Illuminate\Support\Str;
 
 class HistorialController
 {
 
+    //Funcion para realizar el cambio de moneda
     public function cambioMoneda(Request $request)
     {
         $presupuesto = $request->input('amount');
         $divisa = $request->input('currency');
         $apiKey = env('FIXER_API_KEY');
+
         $response = Http::withHeaders([
             'apikey' => $apiKey
-        ])->get('https://api.apilayer.com/fixer/convert', [
-                    'to' => $divisa,
-                    'from' => 'COP',
-                    'amount' => $presupuesto
-                ]);
+        ])->get('https://api.apilayer.com/currency_data/convert', [
+            'to' => $divisa,
+            'from' => 'COP',
+            'amount' => $presupuesto
+        ]);
 
         if ($response->successful()) {
             $cambio = $response->json()['result'];
-            $tasaCambio = $response->json()['info']['rate'];
+            $tasaCambio = $response->json()['info']['quote'];
 
-            return response()->json(['currency' => $divisa, 'converted' => $cambio, 'rate' => $tasaCambio]);
+            return response()->json(['currency' => $divisa, 'converted' => $cambio, 'quote' => $tasaCambio]);
         } else {
             return response()->json(['error' => 'Error al obtener las tasas de cambio'], 500);
         }
     }
 
+    //Funcion para obtener el clima de la ciudad eligida
     public function obtenerClima(Request $request)
     {
         $ciudad = $request->input('ciudad');
-        $apiKey = env('OPENWEATHER_API_KEY');  // Asegúrate de tener la API key en tu archivo .env
+        $apiKey = env('OPENWEATHER_API_KEY');  //la API key en tu archivo .env
         $client = new Client();
-
         $response = $client->get('http://api.openweathermap.org/data/2.5/weather', [
             'query' => [
                 'q' => $ciudad,
@@ -60,7 +63,8 @@ class HistorialController
     }
 
 
-    public function store(Request $request)
+    //Funcion para guarda las busquedas
+    public function guardarBusqueda(Request $request)
     {
         // Validación de los datos de entrada
         $validated = $request->validate([
@@ -102,19 +106,40 @@ class HistorialController
         }
 
         $conversionData = $conversionResponse->getData();
-        $presupuestoLocal = (int)$conversionData->converted;
+        $presupuestoLocal = $conversionData->converted;
+        $divisa = $conversionData->currency;
+        $tasaCambio = $conversionData->quote;
+
+        $presupuestoL = Str::of($divisa)->append(' ', $presupuestoLocal);
 
         // Crear un nuevo registro de historial
         $historial = Historial::create([
             'pais_id' => $validated['pais_id'],
             'ciudad_id' => $validated['ciudad_id'],
             'presupuesto_cop' => $validated['presupuesto_cop'],
-            'presupuesto_local' => $presupuestoLocal,
+            'presupuesto_local' => $presupuestoL,
+            'tasa_cambio' => $tasaCambio,
             'clima' => $temperatura,  // Temperatura en grados Celsius
             'fecha' => now()->toDateString(),  // Formato YYYY-MM-DD
         ]);
 
         return response()->json($historial, 201);
+    }
+
+
+    //Funcion para obtener una sola busqueda
+    public function obtenerHistorial($id)
+    {
+        $historial = Historial::find($id);
+        return response()->json($historial);
+    }
+
+
+    //Funcion para obtener las ultimas 5 busquedas
+    public function historialBusquedas()
+    {
+        $historial = Historial::with(['pais', 'ciudad'])->latest('id')->take(5)->get();
+        return response()->json($historial);
     }
 
 }
